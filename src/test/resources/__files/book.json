@@ -1,0 +1,6 @@
+{
+  "id": "{{jsonPath request.body '$.id'}}",
+  "title": "SRE 101",
+  "author": "John Smith",
+  "error": ""
+}

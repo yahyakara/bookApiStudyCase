@@ -1,0 +1,9 @@
+{
+  "id": "{{request.requestLine.pathSegments.[3]}}",
+  "title": "SRE 101",
+  "author": "John Smith",
+  "status": {
+    "Code": 200,
+    "Message": ""
+  }
+}
