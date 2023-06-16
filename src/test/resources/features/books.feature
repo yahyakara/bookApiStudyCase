@@ -1,3 +1,4 @@
+@regression
 Feature: Adding a Book to the List
   As a user
   I want to be able to add a book to the book list
@@ -34,13 +35,14 @@ Feature: Adding a Book to the List
     When I add a book using the put book service with the following details title : "test"  Author : "test" id : 1
     Then the response status of the put book service should be 400
     Then User should get "Field id is only read only." message from add books service
-
+  @mocked
   Scenario: User can't add book similar book to list
     Given add book service is mocked based on duplicate book validation
     When I add a book using the put book service with the following details title : "Test Book"  Author : "Test Author"
     Then I add a book using the put book service with the following details title : "Test Book"  Author : "Test Author"
     Then User should get "Another book with similar title and author already exists." message from add books service
 
+  @mocked
     Scenario: User can get book information with get book service
       Given the Get Book service is mocked based on validating the retrieval of a book by its ID
       When I utilize the Get Book service to retrieve the book with the ID: 99
