@@ -1,8 +1,6 @@
 package studyCase.steps;
 
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -10,25 +8,24 @@ import io.cucumber.java.en.When;
 import static org.testng.Assert.*;
 
 import studyCase.Models.AddBookResponse;
-import studyCase.Models.BooksItem;
-import studyCase.Models.BooksRes;
+import studyCase.Models.Book;
+import studyCase.Models.GetBookResponse;
 import studyCase.Models.GetBooksResponse;
 import studyCase.Models.Payloads.AddBookPayload;
 import studyCase.clients.BookClient;
 import studyCase.config.IRestResponse;
 import studyCase.mocks.BooksStub;
 
-import java.awt.print.Book;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BookApiSteps {
 
     BookClient bookClient;
     private TestContext context;
 
-    IRestResponse<BooksRes> booksResponse;
+    IRestResponse<GetBooksResponse> booksResponse;
     IRestResponse<AddBookResponse> addedBookResponse;
+    IRestResponse<GetBookResponse> getBookResponse;
     BooksStub booksStub;
 
     @Before
@@ -61,25 +58,33 @@ public class BookApiSteps {
         assert booksResponse.getBody().getBooks().size() == 0;
     }
 
-    @Then("add book service is mocked based on valid response")
+    @Then("the Add book service is mocked based on valid response")
     public void addBookMock() {
         booksStub.createBookStub();
     }
 
-    @Given("add book service is mocked based on title validation")
+    @Given("the Add book service is mocked based on validating title field is required")
     public void addBookTitleValidationMock() {
         booksStub.emptyTitleStub();
     }
 
-    @Given("add book service is mocked based on author validation")
+    @Given("the Add book service is mocked based on validating author field is required")
     public void addBookAuthorValidationMock() {
         booksStub.missingAuthorStub();
     }
 
-    @Given("add book service is mocked based on id validation")
+    @Given("the Add book service is mocked based on validating id filed read only")
     public void addBookIdValidationMock() {
         booksStub.idFieldReadOnlyStub();
     }
+
+
+    @Given("the Get Book service is mocked based on validating the retrieval of a book by its ID")
+    public void theGetBookServiceIsMockedBasedOnValidatingTheRetrievalOfABookByItsID() {
+        booksStub.stubForGetBook();
+        booksStub.stubForGetBookError();
+    }
+
 
     @Given("add book service is mocked based on duplicate book validation")
     public void duplicateBookMock() {
@@ -116,9 +121,9 @@ public class BookApiSteps {
     @Then("the book list obtained from the get books service should include the added book with correct information")
     public void theBookListObtainedFromTheGetBooksServiceShouldIncludeTheAddedBookWithCorrectInformation() {
         AddBookResponse addedBook = addedBookResponse.getBody();
-        List<BooksItem> bookList = booksResponse.getBody().getBooks();
+        List<Book> bookList = booksResponse.getBody().getBooks();
 
-        List<BooksItem> matchingBooks = bookList.stream()
+        List<Book> matchingBooks = bookList.stream()
                 .filter(book -> book.getTitle().equals(addedBook.getTitle()) && book.getAuthor().equals(addedBook.getAuthor()))
                 .toList();
 
@@ -130,5 +135,30 @@ public class BookApiSteps {
     public void userShouldGetMessageFromAddBooksService(String expectedError) {
         String actualError = addedBookResponse.getBody().getError();
         assertEquals(actualError, expectedError);
+    }
+
+
+    @When("I utilize the Get Book service to retrieve the book with the ID: {int}")
+    public void iUtilizeTheGetBookServiceToRetrieveTheBookWithTheID(int id) {
+        getBookResponse = bookClient.getBookResponse(id);
+    }
+
+    @Then("I should receive the information for a book with the title: {string}, author: {string}, and ID: {string}")
+    public void iShouldReceiveTheInformationForABookWithTheTitleAuthorAndID(String expectedTitle, String expectedAuthor, String expectedID) {
+        String actualTitle = getBookResponse.getBody().getTitle();
+        String actualAuthor = getBookResponse.getBody().getAuthor();
+        String actualID= getBookResponse.getBody().getId();
+
+        assertEquals(actualTitle, expectedTitle, "The actual book title does not match the expected title");
+        assertEquals(actualAuthor, expectedAuthor, "The actual author does not match the expected author");
+        assertEquals(actualID, expectedID, "The actual ID does not match the expected ID");
+
+    }
+
+
+    @Then("the response status of the Get Book service should be {int}")
+    public void theResponseStatusOfTheGetBookServiceShouldBe(int expectedStatus) {
+        int actualStatus = getBookResponse.getStatusCode();
+        assertEquals(actualStatus, expectedStatus, "Get book service response should be valid");
     }
 }

@@ -9,7 +9,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static studyCase.mocks.MockServer.getWireMockServerThread;
 
 public class BooksStub {
-    static WireMockServer wireMockServer = getWireMockServerThread();
+    private WireMockServer wireMockServer;
+
+    public BooksStub() {
+        this.wireMockServer = getWireMockServerThread();
+    }
 
     public void emptyBookStoreStub() {
         MockServer.getWireMockServerThread().
@@ -39,18 +43,6 @@ public class BooksStub {
                                 .withBodyFile("missingTitleError.json")));
     }
 
-    private void createBookStub(String title, String author) {
-        String requestBody = String.format("{\"title\": \"%s\", \"author\": \"%s\"}", title, author);
-
-        MockServer.getWireMockServerThread().
-                stubFor(put(urlEqualTo("/api/books"))
-                        .withRequestBody(equalToJson(requestBody))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(200)
-                                .withHeader("Content-Type", "application/json")
-                                .withBodyFile("bookAdded.json")));
-    }
 
     public void missingAuthorStub() {
         MockServer.getWireMockServerThread().
@@ -90,5 +82,21 @@ public class BooksStub {
                                 .withHeader("Content-Type", "application/json")
                                 .withStatus(400)
                                 .withBodyFile("duplicateBookError.json")));
+    }
+
+    public void stubForGetBook() {
+        //mock for id lower than 10
+        wireMockServer.stubFor(get(urlPathMatching("/api/books/(100|[1-9][0-9]?)$"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBodyFile("getBook.json")));
+    }
+
+    public void stubForGetBookError() {
+        wireMockServer.stubFor(get(urlPathMatching("/api/books/([1-9]\\d{2,}|[2-9]\\d{2,})$"))
+                .willReturn(serverError()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(404)));
     }
 }

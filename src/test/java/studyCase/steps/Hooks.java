@@ -25,15 +25,10 @@ public class Hooks {
     }
 
     @After
-    public void closeMock() throws InterruptedException {
+    public void closeMock()  {
         WireMockServer wireMockServer = MockServer.getWireMockServerThread();
-        if (wireMockServer.isRunning()) {
-            wireMockServer.stop();
+        wireMockServer.stop();
 
-            if (wireMockServer.isRunning()) {
-                System.err.println("Failed to stop the WireMock server.");
-            }
-        }
     }
 
 }
