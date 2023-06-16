@@ -91,4 +91,20 @@ public class BooksStub {
                                 .withStatus(400)
                                 .withBodyFile("duplicateBookError.json")));
     }
+
+    public void stubForGetBook() {
+        //mock for id lower than 10
+        wireMockServer.stubFor(get(urlPathMatching("/api/books/(100|[1-9][0-9]?)$"))
+                .willReturn(aResponse()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(200)
+                        .withBodyFile("getBook.json")));
+    }
+
+    public void stubForGetBookError() {
+        wireMockServer.stubFor(get(urlPathMatching("/api/books/([1-9]\\d{2,}|[2-9]\\d{2,})$"))
+                .willReturn(serverError()
+                        .withHeader("Content-Type", "application/json")
+                        .withStatus(404)));
+    }
 }

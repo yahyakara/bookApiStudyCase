@@ -8,7 +8,7 @@ Feature: Adding a Book to the List
     Given Book store is mocked base on empty book list response
     Given I retrieve the book list using the get books service
     Then the book list obtained from the get books service should be empty
-    Given add book service is mocked based on valid response
+    Given the Add book service is mocked based on valid response
     When I add a book using the put book service with the following details title : "Test Book"  Author : "Test Author"
     Then the response status of the put book service should be 201
     Given Book store is mocked base on valid book list response
@@ -17,8 +17,8 @@ Feature: Adding a Book to the List
 
   @mocked
   Scenario Outline: User should not miss the book title or author
-    Given add book service is mocked based on author validation
-    And  add book service is mocked based on title validation
+    Given the Add book service is mocked based on validating author field is required
+    And  the Add book service is mocked based on validating title field is required
     When I add a book using the put book service with the following details title : "<title>"  Author : "<author>"
     Then User should get "<error>" message from add books service
     And the response status of the put book service should be 400
@@ -30,7 +30,7 @@ Feature: Adding a Book to the List
 
   @mocked
   Scenario: Add a book to the list with invalid payload
-    Given add book service is mocked based on id validation
+    Given the Add book service is mocked based on validating id filed read only
     When I add a book using the put book service with the following details title : "test"  Author : "test" id : 1
     Then the response status of the put book service should be 400
     Then User should get "Field id is only read only." message from add books service
@@ -40,3 +40,11 @@ Feature: Adding a Book to the List
     When I add a book using the put book service with the following details title : "Test Book"  Author : "Test Author"
     Then I add a book using the put book service with the following details title : "Test Book"  Author : "Test Author"
     Then User should get "Another book with similar title and author already exists." message from add books service
+
+    Scenario: User can get book information with get book service
+      Given the Get Book service is mocked based on validating the retrieval of a book by its ID
+      When I utilize the Get Book service to retrieve the book with the ID: 99
+      Then I should receive the information for a book with the title: "SRE 101", author: "John Smith", and ID: "99"
+      Then the response status of the Get Book service should be 200
+      When I utilize the Get Book service to retrieve the book with the ID: 101
+      Then the response status of the Get Book service should be 404

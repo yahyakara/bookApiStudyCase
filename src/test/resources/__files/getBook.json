@@ -1,9 +1,5 @@
 {
-  "id": "{{request.requestLine.pathSegments.[3]}}",
+  "id": "{{request.requestLine.pathSegments.[2]}}",
   "title": "SRE 101",
-  "author": "John Smith",
-  "status": {
-    "Code": 200,
-    "Message": ""
-  }
+  "author": "John Smith"
 }
