@@ -9,7 +9,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static studyCase.mocks.MockServer.getWireMockServerThread;
 
 public class BooksStub {
-    static WireMockServer wireMockServer = getWireMockServerThread();
+    private WireMockServer wireMockServer;
+
+    public BooksStub() {
+        this.wireMockServer = getWireMockServerThread();
+    }
 
     public void emptyBookStoreStub() {
         MockServer.getWireMockServerThread().
@@ -39,18 +43,6 @@ public class BooksStub {
                                 .withBodyFile("missingTitleError.json")));
     }
 
-    private void createBookStub(String title, String author) {
-        String requestBody = String.format("{\"title\": \"%s\", \"author\": \"%s\"}", title, author);
-
-        MockServer.getWireMockServerThread().
-                stubFor(put(urlEqualTo("/api/books"))
-                        .withRequestBody(equalToJson(requestBody))
-                        .willReturn(aResponse()
-                                .withHeader("Content-Type", "application/json")
-                                .withStatus(200)
-                                .withHeader("Content-Type", "application/json")
-                                .withBodyFile("bookAdded.json")));
-    }
 
     public void missingAuthorStub() {
         MockServer.getWireMockServerThread().
