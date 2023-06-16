@@ -35,6 +35,7 @@ Feature: Adding a Book to the List
     When I add a book using the put book service with the following details title : "test"  Author : "test" id : 1
     Then the response status of the put book service should be 400
     Then User should get "Field id is only read only." message from add books service
+
   @mocked
   Scenario: User can't add book similar book to list
     Given add book service is mocked based on duplicate book validation
